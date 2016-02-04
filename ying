@@ -1,0 +1,141 @@
+#!/usr/local/bin/python2.7
+# -*- coding: utf8 -*-
+import os
+import shutil
+#入口
+def welcome():
+	print '欢迎使用 YingTool，源码在/usr/local/tool/下，使用CTRL-C退出程序'
+	#调用获取服务函数
+	rootdir=r'/app/'	
+	d = server_dic(rootdir)
+	#显示列表开始
+	print '下面是/app下的所有服务：'
+	print '┏┈'+'┈'*48+'┈┓'
+	print '┃=   序号    =┃=       服务名称                   =┃'
+	for k in sorted(d.keys()):
+		print '┃='+' '*3+str(k)+' '*(8-len(str(k)))+'=│='+' '*4+rootdir+d[k]+' '*(30-len(d[k])-len(rootdir))+'=┃'
+	print '┃=   d       =┃=       操作dubbo服务              =┃'
+	print '┗┈'+'┈'*48+'┈┛'
+	#显示列表结束
+	try:
+	        num = raw_input('\n请输入对应的序号选择服务，选择d可选择dubbo服务: ')
+		#判断是否为dubbo服务
+		if num.lower() == 'd':
+			dubboServer()
+		elif int(num) in sorted(d.keys()):
+			action(int(num),rootdir,d)
+		else:
+			print '\n输入的服务不存在，请重新输入！！！\n'
+			welcome()
+	except KeyboardInterrupt:
+		print '\nyingTool程序终止'
+	except KeyError and ValueError:
+		print '\n输入的服务不存在，请重新输入！！！\n'
+		welcome()
+#dubbo服务函数
+def dubboServer():
+	print '\n开发ing'
+	welcome()
+#操作函数
+def action(num_ser,root,dic):
+	menu = {
+			1:'启动(如果未启动)或重启(如果已启动)服务，并打开日志（清除旧日志）',
+			2:'实时查看日志 tail -f ',
+			3:'停止服务 kill -9',
+			4:'清理日志 >catalina.out'
+		}
+	actionselect = {
+			1:restart,
+			2:viewLog,
+			3:serexists,
+			4:clearLog
+		 }
+        print '\n您输入的：序号 - '+str(num_ser)+'  对应服务 - '+root+dic[num_ser]
+	for n in sorted(menu.keys()):
+		print ' '*25+'┠┈ 输入'+str(n)+' '+menu[n]
+        print ' '*25+'┗┈ 输入q 返回上级菜单 '
+	num = raw_input('\n请输入对应的需要选择操作: ')
+	if num.lower() == 'q':
+		welcome()
+	elif int(num) in sorted(actionselect.keys()):
+		result = actionselect.get(int(num))(num_ser,root,dic)
+		if num == 3 and result != 0:
+			killser(result)
+		if num == 3 and result == 0:
+			print '服务未启动！'
+	else:
+		print '\n输入的操作不存在，请重新输入！！！\n'
+		action(num_ser,root,dic)
+		
+#判断服务存在与否
+def serexists(num_ser,root,dic):
+        pid=os.popen("ps aux|grep "+dic[num_ser]+" |grep -v grep|awk '{print $2}'").read().split()
+        if len(pid) == 0:
+                return 0
+        elif len(pid) == 1:
+                print 'PID为'+pid[0]
+                return pid
+        else:
+                print '服务启动有问题，存在多个进程，如下：'
+                print os.popen("ps aux|grep "+dic[num_ser]+" |grep -v grep|awk '{print $2}'").read()
+
+#杀死服务
+def killser(pid):
+	os.popen('kill -9 '+pid[0]).read()
+	print '杀死PID='+pid[0]+'的进程'
+
+#删除目录函数
+def deleteFile(dir):
+	'''删除目录及目录下文件，再重新创建目录'''
+	if os.path.exists(dir):
+		if os.path.isfile(dir):
+			print dir+'是文件,不是目录！-deleteFile'
+		else:
+			shutil.rmtree(dir)
+			os.mkdir(dir)	
+	else:
+		print '目录不存在！-deleteFile'
+	
+#重启服务		
+def restart(num_ser,root,dic):
+	pid = serexists(num_ser,root,dic)
+	if pid == 0:
+		print '发现服务未启动，开始启动'+root+dic[num_ser]+'服务'
+		#切换工作路径到bin并启动
+		os.chdir(root+dic[num_ser]+'/bin')
+		print os.popen('./startup.sh').read()
+		viewLog(num_ser,root,dic)	
+	else:
+		print '停止服务'
+		killser(pid)	
+		print '清理旧日志'
+		deleteFile(root+dic[num_ser]+'/logs')
+		print '重启'+dic[num_ser]+'服务'
+		os.chdir(root+dic[num_ser]+'/bin')
+		print os.popen('./startup.sh').read()	
+		viewLog(num_ser,root,dic)
+#清空日志
+def clearLog(num_ser,root,dic):
+	os.popen('>'+root+dic[num_ser]+'/logs/catalina.out')
+	print '已清空'+root+dic[num_ser]+'/logs/catalina.out'
+
+#看服务日志
+def viewLog(num_ser,root,dic):
+	if serexists(num_ser,root,dic) == 0:
+		print '服务没启动！-viewLog'
+	else: 
+		print '开始打印'+root+dic[num_ser]+'的日志'
+		print '='*50+'我是分割线'+'='*50
+		os.system('/usr/local/tool/log.sh 1 '+root+dic[num_ser])
+#获取服务路径
+def server_dic(rootdir):
+	i = 0
+	server_dic = {}
+	for filename in os.listdir(rootdir):
+		if filename.startswith(('tomcat','tomcat7')):
+			i+=1
+			server_dic[i]=filename
+	return server_dic
+
+if __name__ == '__main__':
+	welcome()
