@@ -47,7 +47,18 @@ class Util(object):
 			print '开始打印'+root+dic[num_ser]+'的日志'
 			print '='*50+'我是分割线'+'='*50
 			os.system('/usr/local/tool/log.sh 1 '+root+dic[num_ser])
-	#获取服务路径
+
+	#看startlog
+	def viewStartLog(self,num_ser,root,dic):
+		if self.serexists(num_ser,root,dic) == 0:
+			print '服务没启动！-viewLog'
+		else: 
+			print '开始打印'+root+dic[num_ser]+'的日志'
+			print '='*50+'我是分割线'+'='*50
+			os.system('/usr/local/tool/log.sh 3 '+root+dic[num_ser])
+
+
+ 	#获取服务路径
 	def server_dic(self,rootdir):
 		i = 0
 		server_dic = {}

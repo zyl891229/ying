@@ -6,30 +6,31 @@ import Util
 class Actions(object):
 	def __init__(self):
 		self.u=Util.Util()
-	#操作函数
-	def actions(self,num_ser,root,dic):
-		menu = {
+		self.menu = {
 				1:'启动(如果未启动)或重启(如果已启动)服务，并打开日志（清除旧日志）',
 				2:'实时查看日志 tail -f ',
 				3:'停止服务 kill -9',
 				4:'清理日志 >catalina.out'
 			}
 		
-		actionselect = {
+		self.actionselect = {
 				1:self.restart,
 				2:self.u.viewLog,
 				3:self.u.serexists,
 				4:self.u.clearLog
 			 }
+
+	#操作函数
+        def actions(self,num_ser,root,dic):
 	        print '\n您输入的：序号 - '+str(num_ser)+'  对应服务 - '+root+dic[num_ser]
-		for n in sorted(menu.keys()):
-			print ' '*25+'┠┈ 输入'+str(n)+' '+menu[n]
+		for n in sorted(self.menu.keys()):
+			print ' '*25+'┠┈ 输入'+str(n)+' '+self.menu[n]
 	        print ' '*25+'┗┈ 输入q 返回上级菜单 '
 		num = raw_input('\n请输入对应的需要选择操作: ')
 		if num.lower() == 'q':
 			welcome()
-		elif int(num) in sorted(actionselect.keys()):
-			result = actionselect.get(int(num))(num_ser,root,dic)
+		elif int(num) in sorted(self.actionselect.keys()):
+			result = self.actionselect.get(int(num))(num_ser,root,dic)
 			if num == '3' and result != 0:
 				self.u.killser(result)
 			if num == '3' and result == 0:

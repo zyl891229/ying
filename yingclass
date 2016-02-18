@@ -16,7 +16,7 @@ def welcome():
 	#显示列表开始
 	print '下面是'+rootdir+'下的所有服务：'
 	print '┏┈'+'┈'*48+'┈┓'
-	print '┃=   序号    =┃=       服务名称                   =┃'
+	print '┃=   序号    =┃=       服务路径                   =┃'
 	for k in sorted(d.keys()):
 		print '┃='+' '*3+str(k)+' '*(8-len(str(k)))+'=│='+' '*4+rootdir+d[k]+' '*(30-len(d[k])-len(rootdir))+'=┃'
 	print '┃=   d       =┃=       操作dubbo服务              =┃'
