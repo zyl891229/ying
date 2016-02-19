@@ -3,6 +3,7 @@ import os
 import shutil
 import Util
 import Actions
+import dubboCheck
 		
 class DubboSer(object):
 	def __init__(self):
@@ -32,6 +33,7 @@ class DubboSer(object):
         	for k in sorted(d.keys()):
 			if os.path.exists(rootdir+d[k]):
 	                	print '┃='+' '*3+str(k)+' '*(8-len(str(k)))+'=│='+' '*4+rootdir+d[k]+' '*(40-len(d[k])-len(rootdir))+'=┃'
+		print '┃=   s       =┃=       服务生产消费情况                     =┃'
 		print '┃=   r       =┃=       调用重启脚本                         =┃'
 		print '┃=   q       =┃=       返回上级目录                         =┃'	
 		print '┗┈'+'┈'*58+'┈┛'           
@@ -40,6 +42,9 @@ class DubboSer(object):
                 	num = raw_input('\n请输入对应的序号选择服务，选择q可返回上级菜单: ')
 			if num.lower() == 'q':
 				os.system('./yingclass')
+			elif num.lower() == 's':
+				dc=dubboCheck.dubboCheck()
+				dc.check()
 			elif num.lower() == 'r':
 				print '开始重启zookeeper和所有dubbo服务,请稍后......'
 				os.system(rootdir+'/restart_dubbo.sh')	
@@ -59,10 +64,10 @@ class DubboActions(Actions.Actions):
         def actions(self,num_ser,root,dic):
 		#增加dubbo特有功能
 		menulist = [
-				'查看是否有提供者和消费者',
+				#'查看是否有提供者和消费者',
 				]
 		actionslist = [
-				1+1,
+				#1+1,
 				]
 		i = 1
 		list_1 = sorted(self.menu.keys())
