@@ -41,7 +41,7 @@ class DubboSer(object):
         	try:
                 	num = raw_input('\n请输入对应的序号选择服务，选择q可返回上级菜单: ')
 			if num.lower() == 'q':
-				os.system('./yingclass')
+				os.system('./ying')
 			elif num.lower() == 's':
 				dc=dubboCheck.dubboCheck()
 				dc.check()
@@ -83,7 +83,8 @@ class DubboActions(Actions.Actions):
                 print ' '*25+'┗┈ 输入q 返回上级菜单 '
                 num = raw_input('\n请输入对应的需要选择操作: ')
                 if num.lower() == 'q':
-                        self.dubboServer()
+             		ds=DubboSer()           
+			ds.dubboServer()
                 elif int(num) in sorted(self.actionselect.keys()):
 			if dic[num_ser].startswith(('lender','notice')):
 				if self.actionselect.get(int(num)) == self.restart:
